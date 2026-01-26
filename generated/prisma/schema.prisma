@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  HR_ADMIN
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DepartmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// Necessary for Next auth
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? // @db.Text
+  access_token             String? // @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? // @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(EMPLOYEE)
+  employee     Employee? @relation(fields: [employeeId], references: [id])
+  employeeId   String?   @unique
+  accounts     Account[]
+  sessions     Session[]
+  createdAt    DateTime  @default(now())
+}
+
+model Employee {
+  id        String         @id @default(cuid())
+  firstName String
+  lastName  String
+  phone     String
+  email     String         @unique
+  status    EmployeeStatus @default(ACTIVE)
+
+  manager            Employee?    @relation("EmployeeManager", fields: [managerId], references: [id])
+  managerId          String?
+  reports            Employee[]   @relation("EmployeeManager")
+  managedDepartments Department[] @relation("DepartmentManager")
+  user               User?
+
+  departments EmployeeDepartment[]
+}
+
+model Department {
+  id     String           @id @default(cuid())
+  name   String
+  status DepartmentStatus @default(ACTIVE)
+
+  manager   Employee? @relation("DepartmentManager", fields: [managerId], references: [id])
+  managerId String?
+
+  employees EmployeeDepartment[]
+}
+
+model EmployeeDepartment {
+  id           String     @id @default(cuid())
+  employee     Employee   @relation(fields: [employeeId], references: [id])
+  employeeId   String
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId String
+
+  @@unique([employeeId, departmentId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
