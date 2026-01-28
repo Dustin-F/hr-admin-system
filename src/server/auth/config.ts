@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import { type DefaultSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { z } from "zod";
@@ -18,14 +18,11 @@ declare module "next-auth" {
       role: string;
       employeeId: string | null;
     } & DefaultSession["user"];
-    
   }
   interface User {
     role: string;
     employeeId: string | null;
   }
-
-
 }
 
 /**
@@ -48,20 +45,20 @@ export const authConfig = {
             password: z.string().min(1),
           })
           .safeParse(credentials);
-      
+
         if (!parsed.success) return null;
-      
+
         const { email, password } = parsed.data;
-      
+
         const user = await db.user.findUnique({
           where: { email },
         });
-      
+
         if (!user) return null;
-      
+
         const isValid = await compare(password, user.passwordHash);
         if (!isValid) return null;
-      
+
         return {
           id: user.id,
           email: user.email,
@@ -72,15 +69,25 @@ export const authConfig = {
     }),
   ],
   adapter: PrismaAdapter(db) as Adapter,
+  session: { strategy: "jwt" },
+  pages: { signIn: "/login" },
   callbacks: {
-    session: ({ session, user }) => ({
+    jwt: ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.employeeId = user.employeeId;
+      }
+      return token;
+    },
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
-        role: user.role,
-        employeeId: user.employeeId,
+        id: token.id as string,
+        role: token.role as string,
+        employeeId: token.employeeId as string | null,
       },
     }),
   },
-} satisfies NextAuthConfig;
+} satisfies NextAuthOptions;

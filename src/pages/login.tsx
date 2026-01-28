@@ -38,13 +38,17 @@ export default function LoginPage() {
             redirect: false,
             email: values.email,
             password: values.password,
-        });
-
-        if (res?.ok) {
-            await router.push("/");
-        } else {
+            callbackUrl: "/",
+          });
+          
+          if (res?.error) {
             setError("Invalid email or password");
-        }
+            return;
+          }
+          
+          if (res?.url) {
+            await router.push(res.url);
+          }
     };
 
     return (

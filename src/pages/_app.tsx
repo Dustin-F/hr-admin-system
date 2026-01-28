@@ -18,6 +18,10 @@ function AuthGate({
   const router = useRouter();
   const { status } = useSession();
 
+  if (status === "loading") {
+    return null;
+  }
+
   if (status === "unauthenticated" && !isLogin) {
     void router.push("/login");
     return null;
