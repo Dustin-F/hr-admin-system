@@ -1,11 +1,12 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
-/**
- * This is the primary router for your server.
- *
- * All routers added in /api/routers should be manually added here.
- */
-export const appRouter = createTRPCRouter({});
+import { employeeRouter } from "@/server/api/routers/employee";
+import { departmentRouter } from "@/server/api/routers/department";
+
+export const appRouter = createTRPCRouter({
+  employee: employeeRouter,
+  department: departmentRouter,
+});
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

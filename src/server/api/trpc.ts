@@ -1,12 +1,3 @@
-/**
- * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
- * 1. You want to modify request context (see Part 1).
- * 2. You want to create a new middleware or type of procedure (see Part 3).
- *
- * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
- * need to use are documented accordingly near the end.
- */
-
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
@@ -157,4 +148,15 @@ export const protectedProcedure = t.procedure
         session: { ...ctx.session, user: ctx.session.user },
       },
     });
+  });
+
+export const requireRole = (
+  roles: Array<"EMPLOYEE" | "MANAGER" | "HR_ADMIN">,
+) =>
+  protectedProcedure.use(({ ctx, next }) => {
+    const role = ctx.session.user.role as "EMPLOYEE" | "MANAGER" | "HR_ADMIN";
+    if (!roles.includes(role)) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+    return next();
   });
