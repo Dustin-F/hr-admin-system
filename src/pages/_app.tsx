@@ -1,7 +1,6 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
-import { Geist } from "next/font/google";
 import AppShell from "@/components/AppShell";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";

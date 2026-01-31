@@ -94,11 +94,13 @@ export const departmentRouter = createTRPCRouter({
   create: requireRole(["HR_ADMIN"])
     .input(departmentCreateSchema)
     .mutation(async ({ ctx, input }) => {
+      const managerId =
+        input.managerId && input.managerId.trim() !== "" ? input.managerId : null;
       return ctx.db.department.create({
         data: {
           name: input.name,
           status: input.status ?? "ACTIVE",
-          managerId: input.managerId ?? null,
+          managerId,
         },
       });
     }),
@@ -106,12 +108,14 @@ export const departmentRouter = createTRPCRouter({
   update: requireRole(["HR_ADMIN"])
     .input(departmentUpdateSchema)
     .mutation(async ({ ctx, input }) => {
+      const managerId =
+        input.managerId && input.managerId.trim() !== "" ? input.managerId : null;
       return ctx.db.department.update({
         where: { id: input.id },
         data: {
           name: input.name,
           status: input.status ?? "ACTIVE",
-          managerId: input.managerId ?? null,
+          managerId,
         },
       });
     }),

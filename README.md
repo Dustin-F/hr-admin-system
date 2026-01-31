@@ -1,29 +1,49 @@
-# Create T3 App
+# HR Administration System
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## Tech Stack
 
-## What's next? How do I make an app with this?
+- Next.js (T3)
+- TypeScript
+- Prisma + SQLite
+- NextAuth (Credentials)
+- tRPC
+- Tailwind + shadcn/ui
+- Zod + react-hook-form
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Setup
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+1. Install deps
+   npm install
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+2. Create .env
+   DATABASE_URL="file:./db.sqlite"
+   AUTH_SECRET="your-secret"
+   NEXTAUTH_URL="http://localhost:3000"
 
-## Learn More
+3. Migrate DB
+   npx prisma migrate dev
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+4. Seed
+   npx prisma db seed
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+5. Run
+   npm run dev
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Demo Users
 
-## How do I deploy this?
+- HR Admin
+  - Email: hradmin@test.com
+  - Password: TestPass1234
+- Manager
+  - Email: manager@test.com
+  - Password: Password123#
+- Employee
+  - Email: employee@test.com
+  - Password: Password123#
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## Notes
+
+- Default password for new employees: Password123#
+- Logout button is in the top-right header
+- Employees/Departments lists include Edit + Activate/Deactivate actions
+- Filters/search/pagination UI is present as placeholders (not functional yet)
