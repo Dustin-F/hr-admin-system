@@ -28,12 +28,12 @@ Clone → `npm install` → create `.env` (see step 2) → `npx prisma migrate d
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/hr-admin-system.git
+git clone https://github.com/Dustin-F/hr-admin-system.git
 cd hr-admin-system
 npm install
 ```
 
-Replace `YOUR_USERNAME` with the actual GitHub username or org. The Prisma client is generated automatically after `npm install` (postinstall script).
+The Prisma client is generated automatically after `npm install` (postinstall script).
 
 ### 2. Environment variables
 
