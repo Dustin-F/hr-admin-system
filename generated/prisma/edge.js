@@ -196,7 +196,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\dirty\\Documents\\Tech-Genius-Test\\hr-admin-system\\generated\\prisma",
+      "value": "/Users/sammy/Documents/hr-admin-system/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -205,12 +205,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "darwin",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\dirty\\Documents\\Tech-Genius-Test\\hr-admin-system\\prisma\\schema.prisma",
+    "sourceFilePath": "/Users/sammy/Documents/hr-admin-system/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -224,6 +224,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

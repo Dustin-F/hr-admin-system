@@ -46,4 +46,6 @@
 - Default password for new employees: Password123#
 - Logout button is in the top-right header
 - Employees/Departments lists include Edit + Activate/Deactivate actions
-- Filters/search/pagination UI is present as placeholders (not functional yet)
+- Employee list: Status, Department, and Manager filters work (client-side); Clear filters resets them
+- Department list: Status filter works (client-side); Clear filters resets it
+- Search and pagination are UI placeholders only

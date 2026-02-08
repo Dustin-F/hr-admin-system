@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { api } from "@/utils/api";
 import {
   Table,
@@ -13,20 +14,27 @@ import { useSession } from "next-auth/react";
 
 export default function DepartmentsPage() {
   const { data, isLoading } = api.department.list.useQuery();
-
   const { data: session } = useSession();
   const isAdmin = session?.user.role === "HR_ADMIN";
-  
   const utils = api.useUtils();
   const updateDepartment = api.department.update.useMutation({
     onSuccess: () => void utils.department.list.invalidate(),
   });
 
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!statusFilter) return data;
+    return data.filter((dept) => dept.status === statusFilter);
+  }, [data, statusFilter]);
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (!data || data.length === 0) {
     return <div className="p-6">No departments found.</div>;
   }
+
+  const handleClearFilters = () => setStatusFilter("");
 
   return (
     <div className="p-6">
@@ -37,15 +45,19 @@ export default function DepartmentsPage() {
         <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
           <div>
             <label className="mb-1 block">Status</label>
-            <select className="w-full rounded border p-2">
-              <option>(All)</option>
-              <option>Active Only</option>
-               <option>Inactive Only</option>
+            <select
+              className="w-full rounded border p-2"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">(All)</option>
+              <option value="ACTIVE">Active Only</option>
+              <option value="INACTIVE">Inactive Only</option>
             </select>
           </div>
           <div className="flex items-end">
-            <Button variant="outline" size="sm" type="button">
-              Filter
+            <Button variant="outline" size="sm" type="button" onClick={handleClearFilters}>
+              Clear filters
             </Button>
           </div>
         </div>
@@ -77,36 +89,42 @@ export default function DepartmentsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((dept) => (
-            <TableRow key={dept.id}>
-              <TableCell>{dept.name}</TableCell>
-              <TableCell>{dept.status}</TableCell>
-              <TableCell>{dept.manager?.firstName ?? "-"}</TableCell>
-              <TableCell className="space-x-2">
-                <Link className="text-sm underline" href={`/departments/${dept.id}`}>
-                  Edit
-                </Link>
-                {isAdmin && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      updateDepartment.mutate({
-                        id: dept.id,
-                        status: dept.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
-                        name: dept.name,
-                        managerId: dept.managerId ?? null,
-                      })
-                    }
-                  >
-                    {dept.status === "ACTIVE" ? "Deactivate" : "Activate"}
-                  </Button>
-                )}
-                
+          {filteredData.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center text-muted-foreground">
+                No departments match the current filters.
               </TableCell>
             </TableRow>
-          ))}
-          
+          ) : (
+            filteredData.map((dept) => (
+              <TableRow key={dept.id}>
+                <TableCell>{dept.name}</TableCell>
+                <TableCell>{dept.status}</TableCell>
+                <TableCell>{dept.manager?.firstName ?? "-"}</TableCell>
+                <TableCell className="space-x-2">
+                  <Link className="text-sm underline" href={`/departments/${dept.id}`}>
+                    Edit
+                  </Link>
+                  {isAdmin && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        updateDepartment.mutate({
+                          id: dept.id,
+                          status: dept.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+                          name: dept.name,
+                          managerId: dept.managerId ?? null,
+                        })
+                      }
+                    >
+                      {dept.status === "ACTIVE" ? "Deactivate" : "Activate"}
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
       <div className="mt-4 space-x-2 text-sm">

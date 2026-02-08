@@ -36,9 +36,14 @@ export const employeeRouter = createTRPCRouter({
     const role = ctx.session.user.role;
     const userId = ctx.session.user.id;
 
+    const include = {
+      manager: true,
+      departments: { include: { department: true } },
+    };
+
     if (role === "HR_ADMIN") {
       return ctx.db.employee.findMany({
-        include: { manager: true },
+        include,
         orderBy: { lastName: "asc" },
       });
     }
@@ -46,7 +51,7 @@ export const employeeRouter = createTRPCRouter({
     if (role === "EMPLOYEE") {
       return ctx.db.employee.findMany({
         where: { user: { id: userId } },
-        include: { manager: true },
+        include,
         orderBy: { lastName: "asc" },
       });
     }
@@ -68,7 +73,7 @@ export const employeeRouter = createTRPCRouter({
           },
         ],
       },
-      include: { manager: true },
+      include,
       orderBy: { lastName: "asc" },
     });
   }),
